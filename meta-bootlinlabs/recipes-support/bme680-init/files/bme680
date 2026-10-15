@@ -1,0 +1,30 @@
+#!/bin/sh
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
+### BEGIN INIT INFO
+# Provides:          bme680
+# Required-Start:    $local_fs
+# Required-Stop:     
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Declare IIO for BME680 I2C
+### END INIT INFO
+
+case "$1" in
+    start|"")
+        test -e /sys/bus/iio/devices/iio:device0/in_pressure_input && exit 0
+        echo "Loading BME680 IIO interface"
+        echo "bme680 0x76" > /sys/bus/i2c/devices/i2c-1/new_device
+        ;;
+    stop)
+        echo "Unloading BME680 IIO interface"
+        echo "0x76" > /sys/bus/i2c/devices/i2c-1/delete_device
+        ;;
+    *)
+        echo "Usage: $0 {start|stop}" >&2
+        exit 1
+        ;;
+esac
+
+exit 0

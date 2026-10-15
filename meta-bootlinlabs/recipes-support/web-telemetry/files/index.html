@@ -1,0 +1,91 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raspberry Pi 3 - Sensor Monitor</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #1e293b;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 320px;
+            text-align: center;
+        }
+        .metric-card {
+            background-color: #334155;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            border-left: 5px solid #38bdf8;
+        }
+        .metric-card.pressure { border-left-color: #34d399; }
+        .label { font-size: 0.85rem; color: #cbd5e1; text-transform: uppercase; }
+        .value { font-size: 2rem; font-weight: bold; margin-top: 0.25rem; }
+        .unit { font-size: 1rem; font-weight: normal; color: #94a3b8; }
+        .status-bar { font-size: 0.75rem; color: #64748b; margin-top: 1rem; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2 style="margin-top:0; color:#94a3b8;">BME680 Telemetry</h2>
+    <div class="metric-card">
+        <div class="label">Temperature</div>
+        <div class="value"><span id="temp">--</span> <span class="unit">°C</span></div>
+    </div>
+    <div class="metric-card pressure">
+        <div class="label">Pressure</div>
+        <div class="value"><span id="press">--</span> <span class="unit">hPa</span></div>
+    </div>
+    <div class="status-bar">
+        Status: <span id="status">Connecting...</span> | <span id="time">--</span>
+    </div>
+</div>
+
+<script>
+    async function updateMetrics() {
+        const statusEl = document.getElementById('status');
+        const timeEl = document.getElementById('time');
+        const tempEl = document.getElementById('temp');
+        const pressEl = document.getElementById('press');
+
+        try {
+            const response = await fetch('/cgi-bin/data.cgi', { cache: 'no-store' });
+            if (!response.ok) throw new Error('HTTP ' + response.status);
+            const data = await response.json();
+
+            if (data.status === 'ok') {
+                tempEl.textContent = data.temperature.toFixed(2);
+                pressEl.textContent = data.pressure.toFixed(2);
+                statusEl.textContent = 'Live';
+                statusEl.style.color = '#34d399';
+            } else {
+                statusEl.textContent = 'Sensor Error';
+                statusEl.style.color = '#f87171';
+            }
+        } catch (err) {
+            statusEl.textContent = 'Offline';
+            statusEl.style.color = '#f87171';
+        } finally {
+            timeEl.textContent = new Date().toLocaleTimeString();
+        }
+    }
+    updateMetrics();
+    setInterval(updateMetrics, 5000);
+</script>
+
+</body>
+</html>
