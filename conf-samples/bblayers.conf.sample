@@ -1,0 +1,15 @@
+# POKY_BBLAYERS_CONF_VERSION is increased each time build/conf/bblayers.conf
+# changes incompatibly
+POKY_BBLAYERS_CONF_VERSION = "2"
+
+BBPATH = "${TOPDIR}"
+BBFILES ?= ""
+
+BBLAYERS ?= " \
+  /home/dev/Yocto-RPi/poky/meta \
+  /home/dev/Yocto-RPi/poky/meta-poky \
+  /home/dev/Yocto-RPi/poky/meta-yocto-bsp \
+  /home/dev/Yocto-RPi/meta-raspberrypi \
+  /home/dev/Yocto-RPi/builds/rpi3/workspace \
+  /home/dev/Yocto-RPi/meta-bootlinlabs \
+  "
